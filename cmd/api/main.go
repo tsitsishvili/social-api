@@ -3,12 +3,17 @@ package main
 import (
 	"log"
 
+	"github.com/joho/godotenv"
 	"github.com/tsitsishvili/social/internal/db"
 	"github.com/tsitsishvili/social/internal/env"
 	"github.com/tsitsishvili/social/internal/store"
 )
 
+const version = "1.0.0"
+
 func main() {
+	godotenv.Load()
+
 	cfg := config{
 		addr: env.GetString("ADDR", ":4000"),
 		db: dbConfig{
@@ -17,6 +22,7 @@ func main() {
 			maxIdleConns: env.GetInt("DB_MAX_IDLE_CONNS", 2),
 			maxIdleTime:  env.GetString("DB_MAX_IDLE_TIME", "15m"),
 		},
+		env: env.GetString("ENV", "local"),
 	}
 
 	db, err := db.New(
