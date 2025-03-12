@@ -12,8 +12,10 @@ var (
 
 type Storage struct {
 	Posts interface {
-		Create(context.Context, *Post) error
 		GetByID(context.Context, int64) (*Post, error)
+		Update(context.Context, *Post) error
+		Create(context.Context, *Post) error
+		Delete(context.Context, int64) error
 	}
 	Users interface {
 		Create(context.Context, *User) error
