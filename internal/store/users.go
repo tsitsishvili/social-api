@@ -8,11 +8,10 @@ import (
 
 type User struct {
 	ID        int64     `json:"id"`
-	UserName  string    `json:"username"`
+	Username  string    `json:"username"`
 	Email     string    `json:"email"`
 	Password  string    `json:"-"`
 	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
 }
 
 type UserStore struct {
@@ -23,19 +22,20 @@ func (s *UserStore) Create(ctx context.Context, user *User) error {
 	query := `
 		INSERT INTO users (username, email, password)
 		VALUES ($1, $2, $3)
-		RETURNING id, created_at, updated_at
+		RETURNING id, created_at
 	`
+	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
+	defer cancel()
 
 	err := s.db.QueryRowContext(
 		ctx,
 		query,
-		user.UserName,
+		user.Username,
 		user.Email,
 		user.Password,
 	).Scan(
 		&user.ID,
 		&user.CreatedAt,
-		&user.UpdatedAt,
 	)
 
 	if err != nil {

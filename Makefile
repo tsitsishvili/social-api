@@ -13,6 +13,10 @@ migrate-up:
 migrate-down:
 	@migrate -path=$(MIGRATION_PATH) -database=$(DB_DSN) down
 
+.PHONE: seed
+seed:
+	@go run cmd/migrate/seed/main.go
+
 # Allow passing custom migration name like: make migrate-create name=create_users_table
 %:
 	@:

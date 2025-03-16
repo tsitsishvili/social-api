@@ -20,6 +20,30 @@ type CommentStore struct {
 }
 
 func (s *CommentStore) Create(ctx context.Context, post *Comment) error {
+	query := `
+		INSERT INTO comments (content, user_id, post_id)
+		VALUES ($1, $2, $3)
+		RETURNING id, created_at
+	`
+
+	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
+	defer cancel()
+
+	err := s.db.QueryRowContext(
+		ctx,
+		query,
+		post.Content,
+		post.UserID,
+		post.PostID,
+	).Scan(
+		&post.ID,
+		&post.CreatedAt,
+	)
+
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -31,6 +55,10 @@ func (s *CommentStore) GetByPostID(ctx context.Context, postID int64) ([]Comment
 		WHERE c.post_id = $1
 		ORDER BY c.created_at DESC
 	`
+
+	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
+	defer cancel()
+
 	rows, err := s.db.QueryContext(ctx, query, postID)
 	if err != nil {
 		return nil, err
@@ -42,7 +70,7 @@ func (s *CommentStore) GetByPostID(ctx context.Context, postID int64) ([]Comment
 	for rows.Next() {
 		var c Comment
 		c.User = User{}
-		if err := rows.Scan(&c.ID, &c.Content, &c.UserID, &c.PostID, &c.CreatedAt, &c.User.UserName, &c.User.ID); err != nil {
+		if err := rows.Scan(&c.ID, &c.Content, &c.UserID, &c.PostID, &c.CreatedAt, &c.User.Username, &c.User.ID); err != nil {
 			return nil, err
 		}
 
