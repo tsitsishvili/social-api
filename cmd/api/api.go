@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"log"
+	"go.uber.org/zap"
 	"net/http"
 	"time"
 
@@ -16,6 +16,7 @@ import (
 type application struct {
 	config config
 	store  store.Storage
+	logger *zap.SugaredLogger
 }
 
 type config struct {
@@ -97,7 +98,6 @@ func (app *application) run(mux http.Handler) error {
 		IdleTimeout:  time.Minute,
 	}
 
-	log.Printf("Starting server on %s", app.config.addr)
-
+	app.logger.Infow("Starting server", "addr", app.config.addr)
 	return srv.ListenAndServe()
 }
