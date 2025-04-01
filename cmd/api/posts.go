@@ -56,12 +56,12 @@ func (app *application) createPostHandler(w http.ResponseWriter, r *http.Request
 	ctx := r.Context()
 
 	if err := app.store.Posts.Create(ctx, post); err != nil {
-		app.statusInternalServerError(w, r, err)
+		app.internalServerError(w, r, err)
 		return
 	}
 
 	if err := app.jsonResponse(w, http.StatusCreated, post); err != nil {
-		app.statusInternalServerError(w, r, err)
+		app.internalServerError(w, r, err)
 		return
 	}
 }
@@ -84,14 +84,14 @@ func (app *application) getPostHandler(w http.ResponseWriter, r *http.Request) {
 
 	comments, err := app.store.Comments.GetByPostID(r.Context(), post.ID)
 	if err != nil {
-		app.statusInternalServerError(w, r, err)
+		app.internalServerError(w, r, err)
 		return
 	}
 
 	post.Comments = comments
 
 	if err := app.jsonResponse(w, http.StatusOK, post); err != nil {
-		app.statusInternalServerError(w, r, err)
+		app.internalServerError(w, r, err)
 		return
 	}
 }
@@ -125,7 +125,7 @@ func (app *application) deletePostHandler(w http.ResponseWriter, r *http.Request
 		case errors.Is(err, store.ErrNotFound):
 			app.notFoundResponse(w, r, err)
 		default:
-			app.statusInternalServerError(w, r, err)
+			app.internalServerError(w, r, err)
 		}
 		return
 	}
@@ -180,11 +180,11 @@ func (app *application) updatePostHandler(w http.ResponseWriter, r *http.Request
 	}
 
 	if err := app.store.Posts.Update(r.Context(), post); err != nil {
-		app.statusInternalServerError(w, r, err)
+		app.internalServerError(w, r, err)
 	}
 
 	if err := app.jsonResponse(w, http.StatusOK, post); err != nil {
-		app.statusInternalServerError(w, r, err)
+		app.internalServerError(w, r, err)
 	}
 }
 
@@ -206,7 +206,7 @@ func (app *application) postsContextMiddleware(next http.Handler) http.Handler {
 			case errors.Is(err, store.ErrNotFound):
 				app.notFoundResponse(w, r, err)
 			default:
-				app.statusInternalServerError(w, r, err)
+				app.internalServerError(w, r, err)
 			}
 			return
 		}

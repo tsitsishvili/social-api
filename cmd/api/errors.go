@@ -4,7 +4,7 @@ import (
 	"net/http"
 )
 
-func (app *application) statusInternalServerError(w http.ResponseWriter, r *http.Request, err error) {
+func (app *application) internalServerError(w http.ResponseWriter, r *http.Request, err error) {
 	app.logger.Errorw(
 		"internal server error",
 		"method", r.Method,

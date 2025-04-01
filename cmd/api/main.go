@@ -6,6 +6,7 @@ import (
 	"github.com/tsitsishvili/social/internal/env"
 	"github.com/tsitsishvili/social/internal/store"
 	"go.uber.org/zap"
+	"time"
 )
 
 const version = "1.0.0"
@@ -40,6 +41,9 @@ func main() {
 		},
 		env:    env.GetString("ENV", "local"),
 		apiURL: env.GetString("API_URL", "localhost:4000"),
+		mail: mailConfig{
+			exp: env.GetDuration("MAIL_EXP", 24*time.Hour),
+		},
 	}
 
 	logger := zap.Must(zap.NewProduction()).Sugar()

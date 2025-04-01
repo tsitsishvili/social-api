@@ -31,7 +31,7 @@ func (app *application) getUserHandler(w http.ResponseWriter, r *http.Request) {
 	user := getUserFromContext(r)
 
 	if err := app.jsonResponse(w, http.StatusOK, user); err != nil {
-		app.statusInternalServerError(w, r, err)
+		app.internalServerError(w, r, err)
 		return
 	}
 }
@@ -69,7 +69,7 @@ func (app *application) followUserHandler(w http.ResponseWriter, r *http.Request
 	}
 
 	if err := app.jsonResponse(w, http.StatusNoContent, nil); err != nil {
-		app.statusInternalServerError(w, r, err)
+		app.internalServerError(w, r, err)
 	}
 }
 
@@ -95,12 +95,12 @@ func (app *application) unfollowUserHandler(w http.ResponseWriter, r *http.Reque
 	ctx := r.Context()
 
 	if err := app.store.Followers.Unfollow(ctx, followerUser.ID, int64(userID)); err != nil {
-		app.statusInternalServerError(w, r, err)
+		app.internalServerError(w, r, err)
 		return
 	}
 
 	if err := app.jsonResponse(w, http.StatusNoContent, nil); err != nil {
-		app.statusInternalServerError(w, r, err)
+		app.internalServerError(w, r, err)
 	}
 }
 
@@ -121,7 +121,7 @@ func (app *application) usersContextMiddleware(next http.Handler) http.Handler {
 			case errors.Is(err, store.ErrNotFound):
 				app.notFoundResponse(w, r, err)
 			default:
-				app.statusInternalServerError(w, r, err)
+				app.internalServerError(w, r, err)
 			}
 			return
 		}
