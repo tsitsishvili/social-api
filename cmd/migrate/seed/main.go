@@ -12,7 +12,6 @@ func main() {
 	godotenv.Load()
 
 	addr := env.GetString("DB_DSN", "postgres://postgres:root@localhost:5432/social?sslmode=disable")
-
 	conn, err := db.New(addr, 3, 3, "15m")
 	if err != nil {
 		log.Fatalf("Error connecting to database: %v", err)
@@ -22,5 +21,5 @@ func main() {
 
 	storage := store.NewStorage(conn)
 
-	db.Seed(storage)
+	db.Seed(storage, conn)
 }
